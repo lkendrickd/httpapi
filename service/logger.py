@@ -1,10 +1,10 @@
-import logging
 import json
+import logging
 from datetime import datetime
 
 
 class JsonFormatter(logging.Formatter):
-    def format(self, record: logging.LogRecord) -> str:
+    def format(self, record):
         log_record = {
             'timestamp': datetime.now().isoformat(),
             'level': record.levelname,
@@ -13,36 +13,15 @@ class JsonFormatter(logging.Formatter):
             'funcName': record.funcName,
             'lineno': record.lineno,
         }
+        if record.exc_info:
+            log_record['exc_info'] = self.formatException(record.exc_info)
         return json.dumps(log_record)
 
 
-def new_logger(name: str = "app") -> logging.Logger:
-    logger = logging.getLogger(name)
-    if not logger.hasHandlers():
-        logger.setLevel(logging.INFO)
-        handler = logging.StreamHandler()
-        handler.setLevel(logging.INFO)
-        handler.setFormatter(JsonFormatter())
-        logger.addHandler(handler)
-    return logger
-
-
-class NoopLogger:
-    def info(self, *args, **kwargs) -> None:
-        pass
-
-    def error(self, *args, **kwargs) -> None:
-        pass
-
-    def warning(self, *args, **kwargs) -> None:
-        pass
-
-    def debug(self, *args, **kwargs) -> None:
-        pass
-
-    def critical(self, *args, **kwargs) -> None:
-        pass
-
-
-def noop() -> NoopLogger:
-    return NoopLogger()
+def setup_logging(log_level: str = 'ERROR'):
+    root_logger = logging.getLogger()
+    root_logger.info(f"setting log level to {log_level}")
+    root_logger.setLevel(log_level)
+    handler = logging.StreamHandler()
+    handler.setFormatter(JsonFormatter())
+    root_logger.addHandler(handler)

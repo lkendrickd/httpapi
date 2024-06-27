@@ -1,68 +1,72 @@
-from fastapi import FastAPI, Response
-from prometheus_client import start_http_server, Summary, generate_latest, CONTENT_TYPE_LATEST
-import logging
 import argparse
-import os
-from daphne.server import Server
 
-from middleware import setup_middlewares
+import uvicorn
+from fastapi import FastAPI
+from prometheus_client import start_http_server
+
+import middleware
+from config import load_settings
 from error_handlers import setup_error_handlers
-
-app = FastAPI()
-setup_middlewares(app)
-setup_error_handlers(app)
-
-# Initialize Summary for request time
-REQUEST_TIME = Summary('request_processing_seconds', 'Time spent processing request')
-
-# Define build info and pull the values from the environment variables
-build_info = {
-    "version": os.getenv("VERSION", "0.0.0"),
-    "commit": os.getenv("COMMIT", "00000000"),
-    "branch": os.getenv("BRANCH", "main"),
-    "build_date": os.getenv("BUILD_DATE", "1970-01-01T00:00:00Z"),
-}
-
-# /metrics endpoint to expose metrics in Prometheus format
-@app.get("/metrics")
-async def metrics():
-    # Generate latest metrics in Prometheus format
-    return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
-
-# /health endpoint to check the health of the application
-# Simple response however extended checks can be added here
-@app.get("/health")
-async def health():
-    return {"status": "ok"}
-
-# / endpoint for the index page returning the build info
-@app.get("/")
-async def root():
-    with REQUEST_TIME.time():
-        try:
-            return {
-                "message": "online",
-                "build_info": build_info,
-            }
-        except KeyError as e:
-            return {"error": f"An error has occurred: {e}"}
+from handlers import get_metrics, get_health, get_index
+from logger import setup_logging
 
 
-# Run the FastAPI application
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run the FastAPI application")
-    parser.add_argument("--port", type=int, default=9000, help="Port to run the FastAPI application on")
-    parser.add_argument("--host", type=str, default="0.0.0.0", help="Host to run the FastAPI application on")
+def create_app() -> FastAPI:
+    app = FastAPI()
+    app.middleware("http")(middleware.log_requests_middleware())
+    setup_error_handlers(app)
+
+    @app.get("/metrics")
+    async def metrics():
+        return await get_metrics()
+
+    @app.get("/health")
+    async def health():
+        return await get_health()
+
+    @app.get("/")
+    async def root():
+        return await get_index()
+
+    return app
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Run the FastAPI services")
+    parser.add_argument("--config", type=str, help="Path to the configuration file")
+    parser.add_argument("--host", type=str, help="Host to run the FastAPI application on")
+    parser.add_argument("--port", type=int, help="Port to run the FastAPI application on")
+    parser.add_argument("--metrics-port", type=int, help="Port for Prometheus metrics")
+    parser.add_argument(
+        "--log-level",
+        type=str, choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
+        help="Log level for the application"
+    )
     args = parser.parse_args()
-    logging.basicConfig(level=logging.INFO)
+
+    # Load settings from config file and/or environment variables
+    settings = load_settings(args.config)
+
+    # Override settings with command-line arguments if provided
+    if args.host:
+        settings.host = args.host
+    if args.port:
+        settings.port = args.port
+    if args.metrics_port:
+        settings.metrics_port = args.metrics_port
+    if args.log_level:
+        settings.log_level = args.log_level
+
+    # Set up logging with the specified log level
+    setup_logging(log_level=settings.log_level)
 
     # Start the Prometheus metrics server
-    start_http_server(8000)
+    start_http_server(settings.metrics_port)
 
-    # Start the server
-    server = Server(
-        application=app,
-        endpoints=[f"tcp:port={args.port}:interface={args.host}"],
-        signal_handlers=True
-    )
-    server.run()
+    # Create and run the FastAPI application
+    app = create_app()
+    uvicorn.run(app, host=settings.host, port=settings.port, log_level=settings.log_level.lower())
+
+
+if __name__ == "__main__":
+    main()
