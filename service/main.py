@@ -115,7 +115,13 @@ def main():
     # Create and run the FastAPI application
     app = create_app(settings)
     logger.info(f"Starting service on {settings.host}:{settings.port}")
-    uvicorn.run(app, host=settings.host, port=settings.port)
+    uvicorn.run(
+        app,
+        host=settings.host,
+        port=settings.port,
+        log_config=None,
+        access_log=False,
+    )
 
 
 if __name__ == "__main__":
