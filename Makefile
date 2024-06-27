@@ -89,7 +89,9 @@ test:
 
 .PHONY: lint
 lint:
+	$(PIP) show flake8 || $(PIP) install flake8
 	flake8 src/service
+	@if [ $$? -eq 0 ]; then echo "Linting Passed"; exit 0; fi
 
 .PHONY: clean
 clean:
