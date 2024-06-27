@@ -35,7 +35,7 @@ async def get_metrics():
 # get_health function to return the health status of the service
 # additional checks or function calls can be added here for health evaluation
 # handles calls to the /health endpoint
-async def get_health():
+async def health_check():
     return {"status": "ok"}
 
 

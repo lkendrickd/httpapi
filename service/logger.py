@@ -3,6 +3,8 @@ import logging
 from datetime import datetime
 
 
+# JsonFormatter is a custom log formatter that formats log records as JSON allowing
+# for easy parsing and analysis
 class JsonFormatter(logging.Formatter):
     def format(self, record):
         log_record = {
@@ -18,6 +20,7 @@ class JsonFormatter(logging.Formatter):
         return json.dumps(log_record)
 
 
+# setup_logging is a function that sets up logging for the application
 def setup_logging(log_level: str = 'ERROR'):
     root_logger = logging.getLogger()
     root_logger.info(f"setting log level to {log_level}")
