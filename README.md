@@ -1,4 +1,6 @@
-# FastAPI Service
+# HTTPAPI
+
+<img src="images/httpapi.webp" alt="HTTPAPI Logo" width="400"/>
 
 This project is a robust FastAPI-based service with configuration management, error handling, and observability
 features.
