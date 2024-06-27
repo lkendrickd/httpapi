@@ -1,5 +1,5 @@
-# Use an official Python Alpine runtime as a parent image
-FROM python:3.9-alpine
+# Using alpine because of a smaller base image for building
+FROM python:3.9-alpine AS builder
 
 # Define build arguments
 ARG SERVICE_NAME=fastapi-service
@@ -13,27 +13,47 @@ ENV SERVICE_NAME ${SERVICE_NAME}
 ENV SERVICE_PORT ${SERVICE_PORT}
 ENV SERVICE_METRICS_PORT ${SERVICE_METRICS_PORT}
 ENV APP_HOME /opt/${SERVICE_NAME}
-ENV PATH="${APP_HOME}/.local/bin:${PATH}"
 
 # Set work directory
 WORKDIR $APP_HOME
 
-# Install system dependencies
-RUN apk update && apk add --no-cache \
-    build-base \
+# Install build dependencies
+RUN apk add --no-cache --virtual .build-deps \
+    gcc \
+    musl-dev \
     linux-headers
 
 # Copy requirements file
 COPY requirements.txt .
 
 # Install Python dependencies
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy service directory
+# Remove build dependencies
+RUN apk del .build-deps
+
+# Start a new stage for a smaller final image
+FROM python:3.9-alpine
+
+# Copy environment variables and workdir from builder
+ENV SERVICE_NAME ${SERVICE_NAME}
+ENV SERVICE_PORT ${SERVICE_PORT}
+ENV SERVICE_METRICS_PORT ${SERVICE_METRICS_PORT}
+ENV APP_HOME /opt/${SERVICE_NAME}
+ENV PATH="${APP_HOME}/.local/bin:${PATH}"
+
+# Set work directory
+WORKDIR $APP_HOME
+
+# Install make and any other runtime dependencies
+RUN apk add --no-cache make
+
+# Copy installed packages from builder stage
+COPY --from=builder /usr/local/lib/python3.9/site-packages/ /usr/local/lib/python3.9/site-packages/
+COPY --from=builder /usr/local/bin/ /usr/local/bin/
+
+# Copy service directory and Makefile
 COPY service ./service
-
-# Copy Makefile
 COPY Makefile .
 
 # Make ports available to the world outside this container

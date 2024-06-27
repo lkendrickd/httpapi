@@ -1,5 +1,4 @@
 import json
-import os
 from pathlib import Path
 from typing import Optional
 
@@ -8,6 +7,9 @@ from pydantic import Field
 from pydantic_settings import BaseSettings
 
 
+# Settings class is a subclass of BaseSettings and uses Pydantic's
+# Field to define the settings fields.  This enables Pydantic to
+# validate the settings and provide default values
 class Settings(BaseSettings):
     app_name: str = Field("FastAPI App", description="Name of the application")
     debug: bool = Field(False, description="Debug mode flag")
@@ -19,41 +21,27 @@ class Settings(BaseSettings):
     version: str = Field("0.0.0", description="Service version")
     commit: str = Field("00000000", description="Git commit hash")
     branch: str = Field("main", description="Git branch")
-    build_date: str = Field("1970-01-01T00:00:00Z", description="Build date of the service")
+    build_date: str = Field(
+        default="1970-01-01T00:00:00Z",
+        description="Build date of the service"
+    )
 
-    config_file: Optional[Path] = Field(None, description="Path to the configuration file")
-
-    def to_service_config(self):
-        return Settings(
-            app_name=self.app_name,
-            debug=self.debug,
-            host=self.host,
-            port=self.port,
-            metrics_port=self.metrics_port,
-            log_level=self.log_level,
-            version=self.version,
-            commit=self.commit,
-            branch=self.branch,
-            build_date=self.build_date
-        )
-
-    class Config:
-        env_file = ".env"
-        env_prefix = "SERVICE_"
+    config_file: Optional[Path] = Field(
+        default=None,
+        description="Path to the configuration file"
+    )
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self._load_from_env()
+
         if self.config_file:
-            self._load_from_file(self.config_file)
+            self._load_from_file()
 
-    def _load_from_env(self):
-        for field in self.__fields__:
-            env_var = f"SERVICE_{field.upper()}"
-            if env_var in os.environ:
-                setattr(self, field, os.environ[env_var])
+    # _load_from_file method reads the configuration data
+    # from the specified file
+    def _load_from_file(self):
+        file_path = self.config_file
 
-    def _load_from_file(self, file_path: Path):
         if not file_path.exists():
             raise FileNotFoundError(f"Config file not found: {file_path}")
 
@@ -71,6 +59,8 @@ class Settings(BaseSettings):
                 setattr(self, key, value)
 
 
+# load_settings function creates an instance of the Settings class by loading
+# the settings from the specified config file
 def load_settings(config_file: Optional[str] = None) -> Settings:
     return Settings(config_file=Path(config_file) if config_file else None)
 

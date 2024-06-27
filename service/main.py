@@ -42,10 +42,30 @@ def create_app(settings: Settings) -> FastAPI:
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Run the FastAPI services")
-    parser.add_argument("--config", type=Path, help="Path to the configuration file")
-    parser.add_argument("--host", type=str, help="Host to run the FastAPI application on")
-    parser.add_argument("--port", type=int, help="Port to run the FastAPI application on")
-    parser.add_argument("--metrics-port", type=int, help="Port for Prometheus metrics")
+    parser.add_argument(
+        "--config",
+        type=Path,
+        help="Path to the configuration file"
+    )
+
+    parser.add_argument(
+        "--host",
+        type=str,
+        help="Host to run the FastAPI application on"
+    )
+
+    parser.add_argument(
+        "--port",
+        type=int,
+        help="Port to run the FastAPI application on"
+    )
+
+    parser.add_argument(
+        "--metrics-port",
+        type=int,
+        help="Port for Prometheus metrics"
+    )
+
     parser.add_argument(
         "--log-level",
         type=str, choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
@@ -66,17 +86,7 @@ def update_settings(settings: Settings, args) -> Settings:
     return settings
 
 
-from importlib.metadata import version
-
-
-def print_versions():
-    print(f"Pydantic-settings version: {version('pydantic-settings')}")
-    print(f"Pydantic version: {version('pydantic')}")
-    print(f"FastAPI version: {version('fastapi')}")
-
-
 def main():
-    print_versions()
     args = parse_args()
 
     # Configuration hierarchy:
@@ -104,7 +114,7 @@ def main():
 
     # Create and run the FastAPI application
     app = create_app(settings)
-    logger.info(f"Starting FastAPI application on {settings.host}:{settings.port}")
+    logger.info(f"Starting service on {settings.host}:{settings.port}")
     uvicorn.run(app, host=settings.host, port=settings.port)
 
 

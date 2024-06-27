@@ -4,7 +4,10 @@ from fastapi import Response
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST, Summary
 
 # Initialize Summary for request time
-REQUEST_TIME = Summary('request_processing_seconds', 'Time spent processing request')
+REQUEST_TIME = Summary(
+    'request_processing_seconds',
+    'Time spent processing request'
+)
 
 # Define build info and pull the values from the environment variables
 build_info = {
@@ -19,7 +22,8 @@ build_info = {
 ###################################################################
 
 """
- Below are the handlers for the endpoints. This is where the logic for the endpoints is defined.
+ Below are the handlers for the endpoints.
+ This is where the logic for the endpoints is defined.
  If you add an endpoint you will need to add a handler for it here.
 """
 

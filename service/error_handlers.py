@@ -21,5 +21,7 @@ def setup_error_handlers(app: FastAPI):
         logger.error(f"Unhandled exception: {str(exc)}", exc_info=True)
         return JSONResponse(
             status_code=500,
-            content={"message": "An unexpected error occurred. Please try again later."},
+            content={
+                "message": "An unexpected error occurred."
+            },
         )

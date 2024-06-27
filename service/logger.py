@@ -3,8 +3,8 @@ import logging
 from datetime import datetime
 
 
-# JsonFormatter is a custom log formatter that formats log records as JSON allowing
-# for easy parsing and analysis
+# JsonFormatter is a custom log formatter that formats log records
+# as JSON allowing for easy parsing and analysis
 class JsonFormatter(logging.Formatter):
     def format(self, record):
         log_record = {

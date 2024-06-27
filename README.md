@@ -79,7 +79,21 @@ The application can be configured through:
 2. A `config.yaml` file (generate with `make config`)
 3. Command-line arguments
 
-The order of precedence is: Command-line args > Environment variables > Config file > Default values
+The order of preference is:
+
+- Command-line arguments > Environment variables > Config file > Default values.
+
+**Default values (in Settings class):** The Settings class defines default values for each configuration setting using
+pydantic.Field.
+
+**Environment variables:** Pydantic automatically reads environment variables prefixed with SERVICE_ due to
+Config.env_prefix = "SERVICE_" and loads them into corresponding settings if found.
+
+**Config file (if specified):** The load_settings function accepts a --config argument, which specifies a YAML or JSON
+file (Settings.config_file) from which settings are loaded and override defaults.
+
+**Command line arguments:** The parse_args function uses argparse to parse command line arguments (--host, --port,
+--metrics-port, --log-level) and updates the Settings instance accordingly.
 
 ## Docker
 
@@ -96,10 +110,4 @@ Run tests with `make test`. This will execute all tests in the `tests/` director
 
 Run the linter with `make lint` to check code quality.
 
-## Contributing
-
-Please read CONTRIBUTING.md for details on our code of conduct and the process for submitting pull requests.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE.md file for details.
+## License - MIT
