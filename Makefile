@@ -12,7 +12,7 @@ SERVICE_CONFIG_FILE ?= config.yaml
 SERVICE_PORT ?= 9000
 SERVICE_HOST ?= 0.0.0.0
 SERVICE_METRICS_PORT ?= 8000
-APP_HOME ?= /opt/$(SERVICE_NAME)
+SERVICE_HOME ?= /opt/$(SERVICE_NAME)
 
 .PHONY: help
 help:
@@ -56,10 +56,10 @@ run-docker: docker-build docker-run
 run:
 	@if [ -f $(SERVICE_CONFIG_FILE) ]; then \
 		echo "Using configuration file: $(SERVICE_CONFIG_FILE)"; \
-		$(PYTHON) $(APP_HOME)/service/main.py --config $(SERVICE_CONFIG_FILE); \
+		$(PYTHON) $(SERVICE_HOME)/service/main.py --config $(SERVICE_CONFIG_FILE); \
 	else \
 		echo "No configuration file found. Using default settings."; \
-		$(PYTHON) $(APP_HOME)/service/main.py --port $(SERVICE_PORT) --metrics-port $(SERVICE_METRICS_PORT); \
+		$(PYTHON) $(SERVICE_HOME)/service/main.py --port $(SERVICE_PORT) --metrics-port $(SERVICE_METRICS_PORT); \
 	fi
 
 .PHONY: docker-build
@@ -77,7 +77,7 @@ docker-run:
 		-e SERVICE_PORT=$(SERVICE_PORT) \
 		-e SERVICE_METRICS_PORT=$(SERVICE_METRICS_PORT) \
 		-e SERVICE_LOG_LEVEL=$(SERVICE_LOG_LEVEL) \
-		-e APP_HOME=$(APP_HOME) \
+		-e APP_HOME=$(SERVICE_HOME) \
 		-p $(SERVICE_PORT):$(SERVICE_PORT) \
 		-p $(SERVICE_METRICS_PORT):$(SERVICE_METRICS_PORT) \
 		$(IMAGE_NAME):$(VERSION)

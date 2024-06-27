@@ -3,3 +3,4 @@ prometheus_client==0.20.0
 pydantic_settings==2.3.3
 PyYAML==6.0.1
 uvicorn~=0.30.1
+pytest~=8.2.2
