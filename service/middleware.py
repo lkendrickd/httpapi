@@ -40,7 +40,7 @@ def log_requests_middleware() -> Middleware:
 # setup_middlewares is a function that sets up middlewares for the FastAPI app
 def setup_middlewares(app: fastapi, middlewares: List[Callable[[], Middleware]]) -> None:
     """
-    Setup middlewares for the FastAPI app.
+    Setup middlewares for the FastAPI service.
 
     :param app: FastAPI application instance
     :param middlewares: List of middleware factory functions

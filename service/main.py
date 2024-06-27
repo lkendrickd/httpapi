@@ -33,6 +33,10 @@ def create_app(settings: Settings) -> FastAPI:
     async def root():
         return await get_index()
 
+    @app.get("/config", response_model=Settings)
+    async def get_config():
+        return settings.to_service_config()
+
     return app
 
 
@@ -62,7 +66,17 @@ def update_settings(settings: Settings, args) -> Settings:
     return settings
 
 
+from importlib.metadata import version
+
+
+def print_versions():
+    print(f"Pydantic-settings version: {version('pydantic-settings')}")
+    print(f"Pydantic version: {version('pydantic')}")
+    print(f"FastAPI version: {version('fastapi')}")
+
+
 def main():
+    print_versions()
     args = parse_args()
 
     # Configuration hierarchy:
@@ -91,7 +105,7 @@ def main():
     # Create and run the FastAPI application
     app = create_app(settings)
     logger.info(f"Starting FastAPI application on {settings.host}:{settings.port}")
-    uvicorn.run(app, host=settings.host, port=settings.port, log_level=settings.log_level.lower())
+    uvicorn.run(app, host=settings.host, port=settings.port)
 
 
 if __name__ == "__main__":

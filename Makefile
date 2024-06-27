@@ -56,17 +56,19 @@ run-docker: docker-build docker-run
 run:
 	@if [ -f $(SERVICE_CONFIG_FILE) ]; then \
 		echo "Using configuration file: $(SERVICE_CONFIG_FILE)"; \
-		$(PYTHON) $(SERVICE_HOME)/service/main.py --config $(SERVICE_CONFIG_FILE); \
+		$(PYTHON) service/main.py --config $(SERVICE_CONFIG_FILE); \
 	else \
 		echo "No configuration file found. Using default settings."; \
-		$(PYTHON) $(SERVICE_HOME)/service/main.py --port $(SERVICE_PORT) --metrics-port $(SERVICE_METRICS_PORT); \
+		$(PYTHON) service/main.py --port $(SERVICE_PORT) --metrics-port $(SERVICE_METRICS_PORT); \
 	fi
 
 .PHONY: docker-build
 docker-build:
 	$(DOCKER) build -t $(IMAGE_NAME):$(VERSION) \
 		--build-arg SERVICE_NAME=$(SERVICE_NAME) \
-		-f build/Dockerfile .
+        --build-arg SERVICE_PORT=$(SERVICE_PORT) \
+        --build-arg SERVICE_METRICS_PORT=$(SERVICE_METRICS_PORT) \
+        -f build/Dockerfile .
 
 .PHONY: docker-run
 docker-run:

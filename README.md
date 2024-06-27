@@ -11,7 +11,7 @@ features.
     - `error_handlers.py`: Contains custom error handlers for the application.
     - `handlers.py`: Defines the request handlers for various endpoints.
     - `logger.py`: Sets up logging for the application.
-    - `middleware.py`: Contains custom middleware, including request logging.
+    - `middleware.py`: Contains custom middleware, including request logging and custom headers.
 
 - `tests/`: Contains test files for the application.
 - `build/`: Contains build-related files, including the Dockerfile.
@@ -23,7 +23,7 @@ features.
 
 ### service/main.py
 
-The main entry point for the FastAPI application. It sets up the app, configures routes, and starts the server.
+The main entry point for the FastAPI service. It sets up the app, configures routes, and starts the server.
 
 ### service/config.py
 
