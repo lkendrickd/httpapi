@@ -2,7 +2,7 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from service.app import create_app
+from src.service import create_app
 
 
 @pytest.fixture

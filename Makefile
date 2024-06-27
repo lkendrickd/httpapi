@@ -55,12 +55,12 @@ run-docker: docker-build docker-run
 .PHONY: run
 run:
 	@if [ -f $(SERVICE_CONFIG_FILE) ]; then \
-		echo "Using configuration file: $(SERVICE_CONFIG_FILE)"; \
-		$(PYTHON) service/main.py --config $(SERVICE_CONFIG_FILE); \
-	else \
-		echo "No configuration file found. Using default settings."; \
-		$(PYTHON) service/main.py --port $(SERVICE_PORT) --metrics-port $(SERVICE_METRICS_PORT); \
-	fi
+       echo "Using configuration file: $(SERVICE_CONFIG_FILE)"; \
+       $(PYTHON) src/service/main.py --config $(SERVICE_CONFIG_FILE); \
+    else \
+       echo "No configuration file found. Using default settings."; \
+       $(PYTHON) src/service/main.py --port $(SERVICE_PORT) --metrics-port $(SERVICE_METRICS_PORT); \
+    fi
 
 .PHONY: docker-build
 docker-build:
@@ -89,7 +89,7 @@ test:
 
 .PHONY: lint
 lint:
-	flake8 service
+	flake8 src/service
 
 .PHONY: clean
 clean:
@@ -97,6 +97,7 @@ clean:
 	find . -type d -name '__pycache__' -delete
 	rm -rf .pytest_cache
 	rm -rf .mypy_cache
+	rm -rf src/**/__pycache__
 
 .PHONY: version
 version:

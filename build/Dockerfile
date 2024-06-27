@@ -52,8 +52,8 @@ RUN apk add --no-cache make
 COPY --from=builder /usr/local/lib/python3.9/site-packages/ /usr/local/lib/python3.9/site-packages/
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
 
-# Copy service directory and Makefile
-COPY service ./service
+# Copy src directory (which includes service) and Makefile
+COPY src ./src
 COPY Makefile .
 
 # Make ports available to the world outside this container
