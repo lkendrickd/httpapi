@@ -54,7 +54,7 @@ Provides various commands for managing the application:
 
 - `make build`: Installs dependencies
 - `make run`: Runs the application
-- `make test`: Runs tests
+- `make test`: Runs unit tests
 - `make lint`: Runs the linter
 - `make config`: Generates a config file
 - `make docker-build`: Builds a Docker image

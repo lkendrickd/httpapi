@@ -1,4 +1,6 @@
 import json
+import os
+from functools import lru_cache
 from pathlib import Path
 from typing import Optional
 
@@ -62,7 +64,23 @@ class Settings(BaseSettings):
 # load_settings function creates an instance of the Settings class by loading
 # the settings from the specified config file
 def load_settings(config_file: Optional[str] = None) -> Settings:
-    return Settings(config_file=Path(config_file) if config_file else None)
+    env_settings = {
+        "version": os.environ.get("VERSION"),
+        "commit": os.environ.get("COMMIT"),
+        "branch": os.environ.get("BRANCH"),
+        "build_date": os.environ.get("BUILD_DATE"),
+    }
+    # Remove None values
+    env_settings = {k: v for k, v in env_settings.items() if v is not None}
+
+    if config_file:
+        config_file = str(config_file)
+    return Settings(config_file=config_file, **env_settings)
+
+
+@lru_cache()
+def get_settings() -> Settings:
+    return load_settings()
 
 
 settings = load_settings()

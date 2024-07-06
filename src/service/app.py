@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
-from error_handlers import setup_error_handlers
-from handlers import get_metrics, health_check, get_index
+from src.service.error_handlers import setup_error_handlers
+from src.service.handlers import get_metrics, health_check, get_index
 
 
 # create_app sets up the FastAPI service with the necessary

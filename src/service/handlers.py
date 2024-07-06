@@ -3,6 +3,8 @@ import os
 from fastapi import Response
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST, Summary
 
+from config import get_settings
+
 # Initialize Summary for request time
 REQUEST_TIME = Summary(
     'request_processing_seconds',
@@ -40,17 +42,19 @@ async def get_metrics():
 # additional checks or function calls can be added here for health evaluation
 # handles calls to the /health endpoint
 async def health_check():
-    return {"status": "ok"}
+    return {"status": "healthy"}
 
 
 # get_index function to return the index page with the build info
 # handles calls to the / endpoint
 async def get_index():
-    with REQUEST_TIME.time():
-        try:
-            return {
-                "message": "online",
-                "build_info": build_info,
-            }
-        except KeyError as e:
-            return {"error": f"An error has occurred: {e}"}
+    settings = get_settings()
+    return {
+        "message": "online",
+        "build_info": {
+            "version": settings.version,
+            "commit": settings.commit,
+            "branch": settings.branch,
+            "build_date": settings.build_date
+        }
+    }

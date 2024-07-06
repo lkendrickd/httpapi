@@ -6,10 +6,10 @@ import uvicorn
 from fastapi import FastAPI, Response
 from prometheus_client import start_http_server
 
+import handlers
 import middleware
 from config import load_settings, Settings
 from error_handlers import setup_error_handlers
-from handlers import get_metrics, health_check, get_index
 from logger import setup_logging
 
 
@@ -20,18 +20,18 @@ def create_app(settings: Settings) -> FastAPI:
 
     @app.get("/metrics")
     async def metrics():
-        return await get_metrics()
+        return await handlers.get_metrics()
 
     @app.get("/health")
     async def health(response: Response):
-        result = await health_check()
+        result = await handlers.health_check()
         if "status_code" in result:
             response.status_code = result.pop("status_code")
         return result
 
     @app.get("/")
     async def root():
-        return await get_index()
+        return await handlers.get_index()
 
     @app.get("/config", response_model=Settings)
     async def get_config():
