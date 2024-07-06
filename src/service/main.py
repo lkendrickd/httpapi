@@ -33,11 +33,7 @@ def create_app(settings: Settings) -> FastAPI:
     async def root():
         return await handlers.get_index()
 
-    @app.get("/config", response_model=Settings)
-    async def get_config():
-        return settings.to_service_config()
-
-    return app
+    return app  # Make sure this line is present
 
 
 def parse_args():
