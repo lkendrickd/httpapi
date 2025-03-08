@@ -9,7 +9,7 @@ from prometheus_client import start_http_server
 
 from app import create_app
 from config import load_settings, update_settings
-from logger import setup_logging
+from json_logger import setup_logging
 
 
 def parse_args():

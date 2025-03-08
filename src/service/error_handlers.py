@@ -1,11 +1,13 @@
-import logging
+import json_logger
 
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
 
-# logger is an instance of a logger that can be used to log messages
-logger = logging.getLogger(__name__)
+# setup logging
+json_logger.setup_logging(log_level="INFO")
 
+# Call the getLogger function with __name__ parameter
+logger = json_logger.getLogger(__name__)
 
 # setup_error_handlers is a function that sets up error handlers for the app
 def setup_error_handlers(app: FastAPI):

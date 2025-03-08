@@ -13,7 +13,7 @@ features.
     - `config.py`: Defines the `Settings` class for configuration management.
     - `error_handlers.py`: Contains custom error handlers for the application.
     - `handlers.py`: Defines the request handlers for various endpoints.
-    - `logger.py`: Sets up logging for the application.
+    - `json_logger.py`: Sets up logging for the application.
     - `middleware.py`: Contains custom middleware, including request logging and custom headers.
 
 - `tests/`: Contains test files for the application.
@@ -41,9 +41,9 @@ Defines custom exception handlers for the application, ensuring graceful error r
 
 Contains the logic for various API endpoints, including health checks and metrics. Included a system-info endpoint that this readme will guide you through even though added you can see the implementation.
 
-### service/logger.py
+### service/json_logger.py
 
-Sets up logging for the application, configuring log formats and levels.
+Sets up json structured logging for the application, configuring log formats and levels.
 
 ### service/middleware.py
 
