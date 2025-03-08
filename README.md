@@ -8,7 +8,8 @@ features.
 ## Project Structure
 
 - `service/`
-    - `main.py`: The entry point of the application. Sets up the FastAPI app and routes.
+    - `main.py`: The entry point of the application. Sets up the FastAPI app and starts the server.
+    - `app.py`: Contains the `create_app` function to configure the FastAPI application.
     - `config.py`: Defines the `Settings` class for configuration management.
     - `error_handlers.py`: Contains custom error handlers for the application.
     - `handlers.py`: Defines the request handlers for various endpoints.
@@ -25,7 +26,7 @@ features.
 
 ### service/main.py
 
-The main entry point for the FastAPI service. It sets up the app, configures routes, and starts the server.
+The main entry point for the FastAPI service. It sets up the application and starts the server.
 
 ### service/config.py
 
@@ -38,7 +39,7 @@ Defines custom exception handlers for the application, ensuring graceful error r
 
 ### service/handlers.py
 
-Contains the logic for various API endpoints, including health checks and metrics.
+Contains the logic for various API endpoints, including health checks and metrics. Included a system-info endpoint that this readme will guide you through even though added you can see the implementation.
 
 ### service/logger.py
 
@@ -52,7 +53,8 @@ Defines custom middleware, such as request logging, which is applied to all rout
 
 Provides various commands for managing the application:
 
-- `make build`: Installs dependencies
+- `make dependency-install`: Installs dependencies
+- `make dependency-freeze`: Freezes dependencies to `requirements.txt`
 - `make run`: Runs the application
 - `make test`: Runs unit tests
 - `make lint`: Runs the linter
@@ -67,7 +69,7 @@ Defines how to build a Docker image for the application, ensuring it can run in 
 ## Getting Started
 
 1. Clone the repository
-2. Run `make dependency_install` to install dependencies
+2. Run `make dependency-install` to install dependencies
 3. Run `make config` to generate a default configuration file
 4. Run `make run` to start the application
 

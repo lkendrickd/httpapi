@@ -18,8 +18,8 @@ SERVICE_HOME ?= /opt/$(SERVICE_NAME)
 help:
 	@echo "Available targets:"
 	@echo "  help        : Show this help message"
-	@echo "  dependency_install: Install dependencies"
-	@echo "  dependency_freeze : Freeze dependencies"
+	@echo "  dependency-install: Install dependencies"
+	@echo "  dependency-freeze : Freeze dependencies"
 	@echo "  run         : Run the service locally"
 	@echo "  test        : Run tests"
 	@echo "  lint        : Run linter"
@@ -28,12 +28,12 @@ help:
 	@echo "  docker-run  : Run Docker container"
 	@echo "  docker-stop : Stop Docker container"
 
-.PHONY: dependency_install
-dependency_install:
+.PHONY: dependency-install
+dependency-install:
 	$(PIP) install -r requirements.txt
 
-.PHONY: dependency_freeze
-dependency_freeze:
+.PHONY: dependency-freeze
+dependency-freeze:
 	$(PIP) freeze > requirements.txt
 
 .PHONY: config
