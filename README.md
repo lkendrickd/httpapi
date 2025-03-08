@@ -67,7 +67,7 @@ Defines how to build a Docker image for the application, ensuring it can run in 
 ## Getting Started
 
 1. Clone the repository
-2. Run `make build` to install dependencies
+2. Run `make dependency_install` to install dependencies
 3. Run `make config` to generate a default configuration file
 4. Run `make run` to start the application
 
@@ -114,7 +114,7 @@ Run the linter with `make lint` to check code quality.
 
 
 ## Developer Guide: Adding New Endpoints
-Follow these steps to add new endpoints to the FastAPI service, using thid /system-info endpoint as an example.
+Follow these steps to add new endpoints to the FastAPI service, using thr /system-info endpoint as an example.
 
 #### Step 1: Create a Handler Function
 First, add a new handler function in src/service/handlers.py:
@@ -174,7 +174,7 @@ psutil~=7.0.0
 
 #### Install the new dependencies:
 ```sh
-dependency_install
+make dependency_install
 ```
 
 #### Step 3: Register the Route
@@ -225,8 +225,12 @@ async def get_system_info() -> Dict[str, Any]:
 make run
 ```
 
-Test the endpoint:
+**Test the endpoint:**
 ```sh
 curl http://localhost:9000/system-info
 ```
+
+## Docs
+The API documentation is available at `/docs` endpoint. This include an interactive API explorer and documentation for all the endpoints.
+
 ## License - MIT
