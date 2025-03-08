@@ -84,3 +84,24 @@ def get_settings() -> Settings:
 
 
 settings = load_settings()
+
+def update_settings(settings, args) -> Settings:
+    """
+    Update settings with command line arguments.
+    
+    Args:
+        settings: The settings object to update
+        args: The parsed command line arguments
+        
+    Returns:
+        Settings: The updated settings object
+    """
+    if args.host:
+        settings.host = args.host
+    if args.port:
+        settings.port = args.port
+    if args.metrics_port:
+        settings.metrics_port = args.metrics_port
+    if args.log_level:
+        settings.log_level = args.log_level
+    return settings

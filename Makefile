@@ -18,9 +18,9 @@ SERVICE_HOME ?= /opt/$(SERVICE_NAME)
 help:
 	@echo "Available targets:"
 	@echo "  help        : Show this help message"
-	@echo "  build       : Install dependencies"
+	@echo "  dependency_install: Install dependencies"
+	@echo "  dependency_freeze : Freeze dependencies"
 	@echo "  run         : Run the service locally"
-	@echo "  run-docker  : Run the service in a Docker container"
 	@echo "  test        : Run tests"
 	@echo "  lint        : Run linter"
 	@echo "  clean       : Remove build artifacts and cache files"
@@ -28,9 +28,13 @@ help:
 	@echo "  docker-run  : Run Docker container"
 	@echo "  docker-stop : Stop Docker container"
 
-.PHONY: build
-build:
+.PHONY: dependency_install
+dependency_install:
 	$(PIP) install -r requirements.txt
+
+.PHONY: dependency_freeze
+dependency_freeze:
+	$(PIP) freeze > requirements.txt
 
 .PHONY: config
 config:
@@ -48,9 +52,6 @@ config:
 	@echo "build_date: \"$$(date -u +'%Y-%m-%dT%H:%M:%SZ')\"" >> $(SERVICE_CONFIG_FILE)
 	@echo "# Add any other configuration parameters here" >> $(SERVICE_CONFIG_FILE)
 	@echo "Config file created successfully."
-
-.PHONY: run-docker
-run-docker: docker-build docker-run
 
 .PHONY: run
 run:
@@ -71,7 +72,7 @@ docker-build:
         -f build/Dockerfile .
 
 .PHONY: docker-run
-docker-run:
+docker-run: docker-build
 	$(DOCKER) run --rm -it \
 		--name $(SERVICE_NAME) \
 		-e SERVICE_NAME=$(SERVICE_NAME) \

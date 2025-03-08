@@ -1,39 +1,15 @@
+# src/service/main.py - The entry point file
+
 import argparse
 import logging
 from pathlib import Path
 
 import uvicorn
-from fastapi import FastAPI, Response
 from prometheus_client import start_http_server
 
-import handlers
-import middleware
-from config import load_settings, Settings
-from error_handlers import setup_error_handlers
+from app import create_app
+from config import load_settings, update_settings
 from logger import setup_logging
-
-
-def create_app(settings: Settings) -> FastAPI:
-    app = FastAPI(title=settings.app_name, version=settings.version)
-    app.middleware("http")(middleware.log_requests_middleware())
-    setup_error_handlers(app)
-
-    @app.get("/metrics")
-    async def metrics():
-        return await handlers.get_metrics()
-
-    @app.get("/health")
-    async def health(response: Response):
-        result = await handlers.health_check()
-        if "status_code" in result:
-            response.status_code = result.pop("status_code")
-        return result
-
-    @app.get("/")
-    async def root():
-        return await handlers.get_index()
-
-    return app  # Make sure this line is present
 
 
 def parse_args():
@@ -70,19 +46,8 @@ def parse_args():
     return parser.parse_args()
 
 
-def update_settings(settings: Settings, args) -> Settings:
-    if args.host:
-        settings.host = args.host
-    if args.port:
-        settings.port = args.port
-    if args.metrics_port:
-        settings.metrics_port = args.metrics_port
-    if args.log_level:
-        settings.log_level = args.log_level
-    return settings
-
-
 def main():
+    # Parse command line arguments
     args = parse_args()
 
     # Configuration hierarchy:
@@ -108,8 +73,10 @@ def main():
     start_http_server(settings.metrics_port)
     logger.info(f"Metrics server started on port {settings.metrics_port}")
 
-    # Create and run the FastAPI application
-    app = create_app(settings)
+    # Create the FastAPI application
+    app = create_app(title=settings.app_name, version=settings.version)
+    
+    # Run the application with Uvicorn
     logger.info(f"Starting service on {settings.host}:{settings.port}")
     uvicorn.run(
         app,
