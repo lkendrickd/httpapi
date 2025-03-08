@@ -116,56 +116,22 @@ Run the linter with `make lint` to check code quality.
 
 
 ## Developer Guide: Adding New Endpoints
-Follow these steps to add new endpoints to the FastAPI service, using thr /system-info endpoint as an example.
+Follow these steps to add new endpoints to the FastAPI service, using this /foo arbitrary endpoint as an example.
 
-#### Step 1: Create a Handler Function
+#### Step 1: Create a Handler Function - Business Logic
 First, add a new handler function in src/service/handlers.py:
 
 ```python
-async def get_system_info():
+async def get_foo():
     """
-    Get system information endpoint handler.
-    Returns basic information about the system.
+    Returns an arbitrary json structure for demonstration
     """
-    import platform
-    import psutil
-    
-    try:
-        memory = psutil.virtual_memory()
-        disk = psutil.disk_usage('/')
-        
-        return {
-            "system": {
-                "platform": platform.system(),
-                "platform_version": platform.version(),
-                "python_version": platform.python_version(),
-                "architecture": platform.machine(),
-                "processor": platform.processor()
-            },
-            "resources": {
-                "cpu_count": psutil.cpu_count(),
-                "memory_total_gb": round(memory.total / (1024**3), 2),
-                "memory_available_gb": round(memory.available / (1024**3), 2),
-                "memory_percent_used": memory.percent,
-                "disk_total_gb": round(disk.total / (1024**3), 2),
-                "disk_free_gb": round(disk.free / (1024**3), 2),
-                "disk_percent_used": disk.percent
-            }
-        }
-    except Exception as e:
-        # Fallback to basic system info if resource stats fail
-        return {
-            "system": {
-                "platform": platform.system(),
-                "platform_version": platform.version(),
-                "python_version": platform.python_version(),
-                "architecture": platform.machine(),
-                "processor": platform.processor()
-            },
-            "resources": {
-                "error": f"Unable to fetch resource information: {str(e)}"
-            }
-        }
+    return JSONResponse(
+        status_code=200,
+        content={
+            "foo":"ok"
+        },
+    )
 ```
 #### Step 2: Update Dependencies (if needed)
 If your endpoint requires additional libraries, add them to requirements.txt:
@@ -194,28 +160,29 @@ def create_app(title="FastAPI App", version="0.0.0") -> FastAPI:
     app.add_api_route("/", get_index, methods=["GET"])
     
     # Add your new route
-    app.add_api_route("/system-info", get_system_info, methods=["GET"])
+    app.add_api_route("/foo", get_foo, methods=["GET"])
     
     return app
 ```
 You can use either decorator syntax or add_api_route() - both work in FastAPI:
 ```python
 # Decorator syntax alternative
-@app.get("/system-info")
-async def system_info():
-    return await get_system_info()
+@app.get("/foo")
+async def get_foo():
+    return await get_foo()
 ```
 #### Step 4: Add Documentation (Optional)
 FastAPI automatically generates OpenAPI documentation. Enhance it by adding docstrings and type hints:
 ```python
 from typing import Dict, Any
 
-async def get_system_info() -> Dict[str, Any]:
+async def get_foo() -> Dict[str, Any]:
     """
-    Get system information including platform details and resource usage.
+    Returns an arbitrary JSON structure for
+    demonstration purposes
     
     Returns:
-        Dict containing system information and resource statistics
+        A JSONResponse with arbitrary data
     """
     # Implementation...
 ```
@@ -229,7 +196,7 @@ make run
 
 **Test the endpoint:**
 ```sh
-curl http://localhost:9000/system-info
+curl http://localhost:9000/foo
 ```
 
 ## Docs

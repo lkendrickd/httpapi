@@ -3,7 +3,7 @@ from fastapi.responses import Response
 
 from error_handlers import setup_error_handlers
 from middleware import log_requests_middleware
-from handlers import get_metrics, health_check, get_index, get_system_info
+from handlers import get_metrics, health_check, get_index
 
 
 def create_app(title="FastAPI App", version="0.0.0") -> FastAPI:
@@ -36,7 +36,5 @@ def create_app(title="FastAPI App", version="0.0.0") -> FastAPI:
             response.status_code = result.pop("status_code")
         return result
     
-    app.add_api_route("/", get_index, methods=["GET"])
-    app.add_api_route("/system-info", get_system_info, methods=["GET"])
-    
+    app.add_api_route("/", get_index, methods=["GET"])    
     return app

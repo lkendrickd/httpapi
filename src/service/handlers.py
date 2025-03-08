@@ -2,8 +2,7 @@ import os
 from fastapi import Response
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST, Summary
 from config import get_settings
-import platform
-import psutil
+from fastapi.responses import JSONResponse
 
 # Initialize Summary for request time
 REQUEST_TIME = Summary(
@@ -58,45 +57,3 @@ async def get_index():
             "build_date": settings.build_date
         }
     }
-
-async def get_system_info():
-    """
-    Get system information endpoint handler.
-    Returns basic information about the system.
-    """ 
-    try:
-        memory = psutil.virtual_memory()
-        disk = psutil.disk_usage('/')
-        
-        return {
-            "system": {
-                "platform": platform.system(),
-                "platform_version": platform.version(),
-                "python_version": platform.python_version(),
-                "architecture": platform.machine(),
-                "processor": platform.processor()
-            },
-            "resources": {
-                "cpu_count": psutil.cpu_count(),
-                "memory_total_gb": round(memory.total / (1024**3), 2),
-                "memory_available_gb": round(memory.available / (1024**3), 2),
-                "memory_percent_used": memory.percent,
-                "disk_total_gb": round(disk.total / (1024**3), 2),
-                "disk_free_gb": round(disk.free / (1024**3), 2),
-                "disk_percent_used": disk.percent
-            }
-        }
-    except Exception as e:
-        # In case psutil fails or is not available
-        return {
-            "system": {
-                "platform": platform.system(),
-                "platform_version": platform.version(),
-                "python_version": platform.python_version(),
-                "architecture": platform.machine(),
-                "processor": platform.processor()
-            },
-            "resources": {
-                "error": f"Unable to fetch resource information: {str(e)}"
-            }
-        }
