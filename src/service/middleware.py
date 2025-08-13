@@ -7,6 +7,9 @@ from urllib.parse import quote
 import fastapi
 from fastapi import Request, Response
 
+# Pre-compile the regex for ANSI escape sequences for performance
+ANSI_ESCAPE_RE = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
+
 # Middleware is a type alias for a callable that takes a Request
 # and a callable that returns an Awaitable[Response]
 # This enables us to define a middleware as a function.
@@ -18,7 +21,7 @@ Middleware: object = Callable[
 def sanitize_for_logging(value: str) -> str:
     """Sanitizes a string for logging, removing newlines and ANSI escape codes."""
     # Remove ANSI escape sequences
-    value = re.sub(r'\x1B\[[0-?]*[ -/]*[@-~]', '', value)
+    value = ANSI_ESCAPE_RE.sub('', value)
     # Remove newlines and carriage returns
     value = value.replace('\n', '').replace('\r', '')
     return value
@@ -55,7 +58,7 @@ def log_requests_middleware() -> Middleware:
         start_time = time.time()
 
         # Sanitize URL and query parameters for logging
-        safe_url = quote(sanitize_for_logging(str(request.url)), safe=':/?=&')
+        safe_url = quote(sanitize_for_logging(str(request.url)), safe=':/?=&%')
         safe_query_params = quote(sanitize_for_logging(str(request.query_params)))
 
         # Log request details for debugging
