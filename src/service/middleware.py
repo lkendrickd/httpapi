@@ -1,6 +1,7 @@
 import logging
 import time
 from typing import Callable, Awaitable, List
+from urllib.parse import quote
 
 import fastapi
 from fastapi import Request, Response
@@ -43,16 +44,20 @@ def log_requests_middleware() -> Middleware:
         logger = logging.getLogger()
         start_time = time.time()
 
+        # Sanitize URL and query parameters for logging
+        safe_url = quote(str(request.url), safe=':/?=&')
+        safe_query_params = quote(str(request.query_params))
+
         # Log request details for debugging
         logger.info(
-            f"Request details: method={request.method}, url={request.url}, "
-            f"params={request.query_params}"
+            f"Request details: method={request.method}, url={safe_url}, "
+            f"params={safe_query_params}"
         )
 
         response = await call_next(request)
         process_time = time.time() - start_time
         logger.info(
-            f"{request.method} {request.url} {response.status_code} Completed "
+            f"{request.method} {safe_url} {response.status_code} Completed "
             f"in {process_time:.2f} sec"
         )
         return response

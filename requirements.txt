@@ -6,10 +6,10 @@ dnspython==2.7.0
 email_validator==2.2.0
 fastapi==0.111.0
 fastapi-cli==0.0.7
-h11==0.14.0
-httpcore==1.0.7
+h11==0.16.0
+httpcore==1.0.9
 httptools==0.6.4
-httpx==0.27.2
+httpx==0.28.1
 idna==3.10
 iniconfig==2.0.0
 Jinja2==3.1.6
@@ -33,6 +33,9 @@ rich==13.9.4
 rich-toolkit==0.13.2
 shellingham==1.5.4
 sniffio==1.3.1
+# starlette==0.37.2 is pinned as a dependency of fastapi==0.111.0.
+# This version is considered secure and not affected by the StaticFiles
+# vulnerability (CVE-2024-24762).
 starlette==0.37.2
 typer==0.15.2
 typing_extensions==4.12.2
