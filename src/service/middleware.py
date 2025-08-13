@@ -1,4 +1,5 @@
 import logging
+import re
 import time
 from typing import Callable, Awaitable, List
 from urllib.parse import quote
@@ -12,6 +13,15 @@ from fastapi import Request, Response
 Middleware: object = Callable[
     [Request, Callable[[Request], Awaitable[Response]]], Awaitable[Response]
 ]
+
+
+def sanitize_for_logging(value: str) -> str:
+    """Sanitizes a string for logging, removing newlines and ANSI escape codes."""
+    # Remove ANSI escape sequences
+    value = re.sub(r'\x1B\[[0-?]*[ -/]*[@-~]', '', value)
+    # Remove newlines and carriage returns
+    value = value.replace('\n', '').replace('\r', '')
+    return value
 
 
 # add_custom_header_middleware is a middleware that adds
@@ -45,8 +55,8 @@ def log_requests_middleware() -> Middleware:
         start_time = time.time()
 
         # Sanitize URL and query parameters for logging
-        safe_url = quote(str(request.url), safe=':/?=&')
-        safe_query_params = quote(str(request.query_params))
+        safe_url = quote(sanitize_for_logging(str(request.url)), safe=':/?=&')
+        safe_query_params = quote(sanitize_for_logging(str(request.query_params)))
 
         # Log request details for debugging
         logger.info(
