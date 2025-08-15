@@ -1,9 +1,14 @@
 import logging
+import re
 import time
 from typing import Callable, Awaitable, List
+from urllib.parse import quote
 
 import fastapi
 from fastapi import Request, Response
+
+# Pre-compile the regex for ANSI escape sequences for performance
+ANSI_ESCAPE_RE = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
 
 # Middleware is a type alias for a callable that takes a Request
 # and a callable that returns an Awaitable[Response]
@@ -11,6 +16,15 @@ from fastapi import Request, Response
 Middleware: object = Callable[
     [Request, Callable[[Request], Awaitable[Response]]], Awaitable[Response]
 ]
+
+
+def sanitize_for_logging(value: str) -> str:
+    """Sanitizes a string for logging, removing newlines and ANSI escape codes."""
+    # Remove ANSI escape sequences
+    value = ANSI_ESCAPE_RE.sub('', value)
+    # Remove newlines and carriage returns
+    value = value.replace('\n', '').replace('\r', '')
+    return value
 
 
 # add_custom_header_middleware is a middleware that adds
@@ -43,16 +57,20 @@ def log_requests_middleware() -> Middleware:
         logger = logging.getLogger()
         start_time = time.time()
 
+        # Sanitize URL and query parameters for logging
+        safe_url = quote(sanitize_for_logging(str(request.url)), safe=':/?=&%')
+        safe_query_params = quote(sanitize_for_logging(str(request.query_params)))
+
         # Log request details for debugging
         logger.info(
-            f"Request details: method={request.method}, url={request.url}, "
-            f"params={request.query_params}"
+            f"Request details: method={request.method}, url={safe_url}, "
+            f"params={safe_query_params}"
         )
 
         response = await call_next(request)
         process_time = time.time() - start_time
         logger.info(
-            f"{request.method} {request.url} {response.status_code} Completed "
+            f"{request.method} {safe_url} {response.status_code} Completed "
             f"in {process_time:.2f} sec"
         )
         return response
